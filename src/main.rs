@@ -1,23 +1,10 @@
-enum BinOp {
-    Add,
-    Sub,
-    Mul,
-    Div,
-}
+mod chapter_1;
+mod chapter_2;
 
-enum Statement {
-    CompoundStatement(Box<Statement>, Box<Statement>),
-    Assignment { id: String, expr: Box<Expression> },
-    Print(Vec<Expression>),
-}
-
-enum Expression {
-    Id(String),
-    Num(i32),
-    Op(Box<Expression>, BinOp, Box<Expression>),
-    Eseq(Statement, Box<Expression>)
-}
+use crate::chapter_1::*;
+use crate::chapter_2::*;
 
 fn main() {
-    println!("Hello, world!");
+    test_exercise_1();
+    test_exercise_2();
 }
