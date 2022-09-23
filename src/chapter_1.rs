@@ -3,7 +3,7 @@ use std::cmp;
 use std::collections::HashMap;
 
 /// Variant for binary operators
-pub enum BinOp {
+enum BinOp {
     Add,
     Sub,
     Mul,
@@ -27,14 +27,14 @@ where
 }
 
 /// A statement in the program. Statements do not return anything
-pub enum Statement {
+enum Statement {
     Compound(Box<Statement>, Box<Statement>),
     Assignment { id: String, expr: Box<Expression> },
     Print(Vec<Expression>),
 }
 
 /// An expression in the program. Expressions currently always return an integer
-pub enum Expression {
+enum Expression {
     Id(String),
     Num(i32),
     Op(Box<Expression>, BinOp, Box<Expression>),
@@ -42,7 +42,7 @@ pub enum Expression {
 }
 
 /// Returns the maximum number of arguments of any print statement within any subexpression of a given statement
-pub fn max_args(stm: &Statement) -> i32 {
+fn max_args(stm: &Statement) -> i32 {
     match stm {
         Statement::Compound(l, r) => return cmp::max(max_args(l), max_args(r)),
         Statement::Assignment { id: _, expr } => return max_args_expr(expr),
@@ -57,7 +57,7 @@ pub fn max_args(stm: &Statement) -> i32 {
 }
 
 /// Helper function for max_args to do the same functionality on an expression
-pub fn max_args_expr(eseq: &Expression) -> i32 {
+fn max_args_expr(eseq: &Expression) -> i32 {
     match eseq {
         Expression::Id(_) => return 0,
         Expression::Num(_) => return 0,
@@ -67,7 +67,7 @@ pub fn max_args_expr(eseq: &Expression) -> i32 {
 }
 
 /// Interperets a statement
-pub fn interp(stm: &Statement) {
+fn interp(stm: &Statement) {
     let mut context = HashMap::new();
     interp_stm(stm, &mut context);
 }
