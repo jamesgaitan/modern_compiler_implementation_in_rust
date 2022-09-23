@@ -1,4 +1,4 @@
-## **NOTE:**
+## **NOTE**
 
 This project is meant as a learning exercise. The code in this
 project is _NOT_ well designed, implemented, documented, or tested. This
@@ -15,7 +15,7 @@ not just follow along.
 
 ## Concepts Studied
 
-* Lexical Analysis
+* Lexical Analysis and Tokenization
 
 ## Skills/Tools Used
 
