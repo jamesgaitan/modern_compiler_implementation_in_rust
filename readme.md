@@ -13,11 +13,15 @@ The purpose of this project is to learn the basics of compilers through this boo
 to use Rust over C as a challenge, to strengthen my skill in Rust, and to force me to understand the concepts in the book and
 not just follow along.
 
+The information learned in this book and future compiler books will be used to write the [pebble language](https://github.com/jamesgaitan/pebble). A language
+I will be developing which is designed and implemented specifically for embedded systems. The language will use the LLVM toolchain.
+
 ## Concepts Studied
 
-* Lexical Analysis and Tokenization
+* Lexical Analysis and Tokenization (Chapter 2)
+* Language Parsing  (Chapter 3)
 
 ## Skills/Tools Used
 
-* Rust
-* Regular Expressions
+* Rust (All Chapters)
+* Regular Expressions (Chapter 2)

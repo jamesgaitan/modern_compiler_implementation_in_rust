@@ -106,7 +106,9 @@ fn interp_expr(expr: &Expression, context: &mut HashMap<String, i32>) -> i32 {
     }
 }
 
-pub fn test_exercise_1() {
+pub fn test_chapter_1() {
+    println!("\n----Test Chapter 1----\n");
+
     let prog = Statement::Compound(
         Box::new(Statement::Assignment {
             id: "a".to_string(),
@@ -135,7 +137,14 @@ pub fn test_exercise_1() {
                     )),
                 )),
             }),
-            Box::new(Statement::Print(vec![Expression::Id("b".to_string())])),
+            Box::new(Statement::Print(vec![
+                Expression::Id("b".to_string()),
+                Expression::Op(
+                    Box::new(Expression::Num(10)),
+                    BinOp::Div,
+                    Box::new(Expression::Id("a".to_string())),
+                ),
+            ])),
         )),
     );
 

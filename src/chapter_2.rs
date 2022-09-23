@@ -382,7 +382,8 @@ fn match_error(input: &str) -> (&str, Option<Token>) {
     panic!("Invalid token: {}", input);
 }
 
-pub fn test_exercise_2() {
+pub fn test_chapter_2() {
+    println!("\n----Test Chapter 2----\n");
     let tokens = tokenize("57 if abcd 64.0 True False \"Hello World :)\" , { } [ ] . / + - * = > < | & if else elseif for while fn let int bool float string char mut");
     println!("{:?}", tokens);
 }
