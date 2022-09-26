@@ -1,0 +1,97 @@
+use std::str::FromStr;
+
+use ast::*;
+
+grammar;
+
+// Boolean: bool = <s:r"(True)|(False)"> => bool::from_str(s).unwrap();
+
+Num: i32 = {
+    <s:r"[0-9]+"> => s.parse().unwrap(),
+};
+
+Real: f32 = {
+    <s:r"[0-9]+\.[0-9]+"> => s.parse().unwrap(),
+};
+
+Identifier: String = {
+    <i:r"[_a-zA-Z][_a-zA-Z0-9]*"> => i.to_string(),
+};
+
+pub Atom: Atom = {
+    Identifier => Atom::Id(<>),
+    Num => Atom::Int(<>),
+    Real => Atom::Float(<>),
+};
+
+pub Expr: Expr = {
+    "(" <e:Expr> ")" => e,
+    Atom => Expr::Atom(<>),
+    <f:FunctionCall> => f.into(),
+    
+};
+
+Factor: Expr = {
+    <l:Factor> "*" <r:Term> => BinOpExpr {left: l, op: BinOp::Mul, right: r},
+    <l:Factor> "/" <r:Term> => BinOpExpr {left: l, op: BinOp::Div, right: r},
+    Term,
+};
+
+Term: Expr = {
+    <l:Expr> "+" <r:Factor> => BinOpExpr {left: l, op: BinOp::Add, right: r},
+    <l:Expr> "-" <r:Factor> => BinOBinOpExpr {left: l, op: BinOp::Sub, right: r}pExpr,
+    Factor,
+};
+
+pub FunctionCall: FunctionCall = {
+    <i:Identifier> "(" <a:CommaSeparated<Expr>> ")" => FunctionCall::new(i, a),
+};
+
+CommaSeparated<T>: Vec<T> = { 
+    <v:(<T> ",")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
+pub Statement = {
+    <Initialization> ";",
+    <Assignment> ";",
+};
+
+pub Initialization: () = { 
+    "let" "mut"? <Identifier> "=" <Expr> => (),
+    "let" "mut"? <Identifier> ":" <Type> "=" <Expr> => (),
+};
+
+pub Assignment: () = { 
+    <Identifier> "=" <Expr>,
+};
+
+pub Type = { 
+    "int",
+    "float",
+    "bool",
+    "char",
+    "string",
+};
+
+pub CodeBlock: () = { 
+    "{" (<Statement>)+ "}",
+};
+
+pub IfBlock: () = { 
+    "if" <Expr> <CodeBlock> ("elseif" <Expr> <CodeBlock>)* ("else" <CodeBlock>)?,
+};
+
+pub ForLoop: () = { 
+    "for" <Expr> ";" <Expr> ";" <Expr> <CodeBlock>,
+};
+
+pub WhileLoop: () = { 
+    "while" <Expr> <CodeBlock>,
+};
