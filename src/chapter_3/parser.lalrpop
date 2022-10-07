@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use ast::*;
+use crate::chapter_3::ast::{Atom, BinOp, BinOpExpr, Expr, FunctionCall};
 
 grammar;
 
@@ -27,24 +27,24 @@ pub Atom: Atom = {
 pub Expr: Expr = {
     "(" <e:Expr> ")" => e,
     Atom => Expr::Atom(<>),
-    <f:FunctionCall> => f.into(),
+    <f:FunctionCall> => Expr::FunctionCall(f),
     
 };
 
 Factor: Expr = {
-    <l:Factor> "*" <r:Term> => BinOpExpr {left: l, op: BinOp::Mul, right: r},
-    <l:Factor> "/" <r:Term> => BinOpExpr {left: l, op: BinOp::Div, right: r},
+    <l:Factor> "*" <r:Term> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Mul, right: r})),
+    <l:Factor> "/" <r:Term> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Div, right: r})),
     Term,
 };
 
 Term: Expr = {
-    <l:Expr> "+" <r:Factor> => BinOpExpr {left: l, op: BinOp::Add, right: r},
-    <l:Expr> "-" <r:Factor> => BinOBinOpExpr {left: l, op: BinOp::Sub, right: r}pExpr,
+    <l:Expr> "+" <r:Factor> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Add, right: r})),
+    <l:Expr> "-" <r:Factor> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Sub, right: r})),
     Factor,
 };
 
 pub FunctionCall: FunctionCall = {
-    <i:Identifier> "(" <a:CommaSeparated<Expr>> ")" => FunctionCall::new(i, a),
+    <i:Identifier> "(" <a:CommaSeparated<Expr>> ")" => FunctionCall {name: i, arguments: a},
 };
 
 CommaSeparated<T>: Vec<T> = { 

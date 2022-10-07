@@ -29,7 +29,7 @@ pub struct BinOpExpr {
 pub enum Expr {
     FunctionCall(FunctionCall),
     Atom(Atom),
-    BinOpExpr(BinOpExpr),
+    BinOpExpr(Box<BinOpExpr>),
 }
 
 #[derive(Debug, Clone, PartialEq)]
