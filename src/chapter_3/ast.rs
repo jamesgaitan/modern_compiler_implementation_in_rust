@@ -1,3 +1,13 @@
+/// Reserved words not allowable to be used as identifiers
+static RESERVED_WORDS: &'static [&str] = &[
+    "if", "else", "elseif", "for", "while", "fn", "let", "int", "bool", "float", "string", "char",
+    "mut", "True", "False",
+];
+
+pub fn is_reserved(word: &str) -> bool {
+    return RESERVED_WORDS.contains(&word);
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Atom {
     Id(String),

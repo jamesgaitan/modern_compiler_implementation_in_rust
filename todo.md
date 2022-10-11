@@ -9,6 +9,7 @@ _Done_
 ## Chapter 3
 
 * Read
-* Write custom parser (Done)
+* Get lalrpop working (Done)
+* Write custom parser
 * Write tests for parser
 * Do chapter exercises

@@ -4,8 +4,6 @@ use crate::chapter_3::ast::{Atom, BinOp, BinOpExpr, Expr, FunctionCall};
 
 grammar;
 
-// Boolean: bool = <s:r"(True)|(False)"> => bool::from_str(s).unwrap();
-
 Num: i32 = {
     <s:r"[0-9]+"> => s.parse().unwrap(),
 };
@@ -15,10 +13,12 @@ Real: f32 = {
 };
 
 Identifier: String = {
-    <i:r"[_a-zA-Z][_a-zA-Z0-9]*"> => i.to_string(),
+    <s:r"[_a-zA-Z][_a-zA-Z0-9]*"> => s.to_string(),
 };
 
 pub Atom: Atom = {
+    "True" => Atom::Boolean(true),
+    "False" => Atom::Boolean(false),
     Identifier => Atom::Id(<>),
     Num => Atom::Int(<>),
     Real => Atom::Float(<>),
