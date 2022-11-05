@@ -47,3 +47,13 @@ pub struct FunctionCall {
     pub name: String,
     pub arguments: Vec<Expr>,
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Statement {
+    Expr,
+    Assignment,
+    Initialization,
+    IfBlock,
+    ForLoop,
+    WhileLoop,
+}

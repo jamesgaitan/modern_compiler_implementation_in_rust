@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::chapter_3::ast::{Atom, BinOp, BinOpExpr, Expr, FunctionCall};
+use crate::chapter_3::ast::{Atom, BinOp, BinOpExpr, Expr, FunctionCall, Statement};
 
 grammar;
 
@@ -25,21 +25,20 @@ pub Atom: Atom = {
 };
 
 pub Expr: Expr = {
-    "(" <e:Expr> ")" => e,
+    "(" <t:Term> ")" => t,
     Atom => Expr::Atom(<>),
     <f:FunctionCall> => Expr::FunctionCall(f),
-    
 };
 
-Factor: Expr = {
-    <l:Factor> "*" <r:Term> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Mul, right: r})),
-    <l:Factor> "/" <r:Term> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Div, right: r})),
-    Term,
+pub Factor: Expr = {
+    <l:Factor> "*" <r:Expr> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Mul, right: r})),
+    <l:Factor> "/" <r:Expr> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Div, right: r})),
+    Expr,
 };
 
-Term: Expr = {
-    <l:Expr> "+" <r:Factor> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Add, right: r})),
-    <l:Expr> "-" <r:Factor> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Sub, right: r})),
+pub Term: Expr = {
+    <l:Term> "+" <r:Factor> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Add, right: r})),
+    <l:Term> "-" <r:Factor> => Expr::BinOpExpr(Box::new(BinOpExpr {left: l, op: BinOp::Sub, right: r})),
     Factor,
 };
 
@@ -58,18 +57,22 @@ CommaSeparated<T>: Vec<T> = {
     }
 };
 
-pub Statement = {
-    <Initialization> ";",
-    <Assignment> ";",
+pub Statement: Statement = {
+    <e:Expr> ";" => Statement::Expr,
+    <i:Initialization> ";" => i,
+    <a:Assignment> ";" => a,
+    <i:IfBlock> => i,
+    <f:ForLoop> => f,
+    <w:WhileLoop> => w
 };
 
-pub Initialization: () = { 
-    "let" "mut"? <Identifier> "=" <Expr> => (),
-    "let" "mut"? <Identifier> ":" <Type> "=" <Expr> => (),
+pub Initialization: Statement = { 
+    "let" "mut"? <Identifier> "=" <Expr> => Statement::Initialization,
+    "let" "mut"? <Identifier> ":" <Type> "=" <Expr> => Statement::Initialization,
 };
 
-pub Assignment: () = { 
-    <Identifier> "=" <Expr>,
+pub Assignment: Statement = { 
+    <Identifier> "=" <Expr> => Statement::Assignment,
 };
 
 pub Type = { 
@@ -84,14 +87,14 @@ pub CodeBlock: () = {
     "{" (<Statement>)+ "}",
 };
 
-pub IfBlock: () = { 
-    "if" <Expr> <CodeBlock> ("elseif" <Expr> <CodeBlock>)* ("else" <CodeBlock>)?,
+pub IfBlock: Statement = { 
+    "if" <Expr> <CodeBlock> ("elseif" <Expr> <CodeBlock>)* ("else" <CodeBlock>)? => Statement::IfBlock,
 };
 
-pub ForLoop: () = { 
-    "for" <Expr> ";" <Expr> ";" <Expr> <CodeBlock>,
+pub ForLoop: Statement = { 
+    "for" <Expr> ";" <Expr> ";" <Expr> <CodeBlock> => Statement::ForLoop,
 };
 
-pub WhileLoop: () = { 
-    "while" <Expr> <CodeBlock>,
+pub WhileLoop: Statement = { 
+    "while" <Expr> <CodeBlock> => Statement::WhileLoop,
 };
