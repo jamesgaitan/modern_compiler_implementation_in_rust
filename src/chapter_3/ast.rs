@@ -50,10 +50,16 @@ pub struct FunctionCall {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Statement {
-    Expr,
-    Assignment,
-    Initialization,
-    IfBlock,
-    ForLoop,
-    WhileLoop,
+    Expr(Expr),
+    Assignment(String, Expr),
+    Initialization {
+        id: String,
+        mutable: bool,
+        var_type: String,
+        val: Expr,
+    },
+    IfBlock(Expr, Vec<Statement>),
+    IfElseBlock(Expr, Vec<Statement>, Vec<Statement>),
+    ForLoop(Expr, Expr, Expr, Vec<Statement>),
+    WhileLoop(Expr, Vec<Statement>),
 }

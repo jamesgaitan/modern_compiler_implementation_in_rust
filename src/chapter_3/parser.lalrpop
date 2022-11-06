@@ -58,7 +58,7 @@ CommaSeparated<T>: Vec<T> = {
 };
 
 pub Statement: Statement = {
-    <e:Expr> ";" => Statement::Expr,
+    <e:Expr> ";" => Statement::Expr(e),
     <i:Initialization> ";" => i,
     <a:Assignment> ";" => a,
     <i:IfBlock> => i,
@@ -67,12 +67,14 @@ pub Statement: Statement = {
 };
 
 pub Initialization: Statement = { 
-    "let" "mut"? <Identifier> "=" <Expr> => Statement::Initialization,
-    "let" "mut"? <Identifier> ":" <Type> "=" <Expr> => Statement::Initialization,
+    "let" <i:Identifier> "=" <e:Expr> => Statement::Initialization { id: i, mutable: false, var_type: "".to_string(), val: e },
+    "let mut" <i:Identifier> "=" <e:Expr> => Statement::Initialization { id: i, mutable: true, var_type: "".to_string(), val: e },
+    "let" <i:Identifier> ":" <t:Type> "=" <e:Expr> => Statement::Initialization { id: i, mutable: false, var_type: t.to_string(), val: e },
+    "let mut" <i:Identifier> ":" <t:Type> "=" <e:Expr> => Statement::Initialization { id: i, mutable: true, var_type: t.to_string(), val: e },
 };
 
 pub Assignment: Statement = { 
-    <Identifier> "=" <Expr> => Statement::Assignment,
+    <i:Identifier> "=" <e:Expr> => Statement::Assignment(i, e),
 };
 
 pub Type = { 
@@ -83,18 +85,19 @@ pub Type = {
     "string",
 };
 
-pub CodeBlock: () = { 
-    "{" (<Statement>)+ "}",
+pub CodeBlock: Vec<Statement> = { 
+    "{" <v:(<Statement>)+> "}" => v,
 };
 
 pub IfBlock: Statement = { 
-    "if" <Expr> <CodeBlock> ("elseif" <Expr> <CodeBlock>)* ("else" <CodeBlock>)? => Statement::IfBlock,
+    "if" <e:Expr> <c:CodeBlock> => Statement::IfBlock(e, c),
+    "if" <e:Expr> <c:CodeBlock> "else" <ec:CodeBlock> => Statement::IfElseBlock(e, c, ec)
 };
 
 pub ForLoop: Statement = { 
-    "for" <Expr> ";" <Expr> ";" <Expr> <CodeBlock> => Statement::ForLoop,
+    "for" <e1: Expr> ";" <e2: Expr> ";" <e3: Expr> <c: CodeBlock> => Statement::ForLoop(e1, e2, e3, c),
 };
 
 pub WhileLoop: Statement = { 
-    "while" <Expr> <CodeBlock> => Statement::WhileLoop,
+    "while" <e: Expr> <c: CodeBlock> => Statement::WhileLoop(e, c),
 };

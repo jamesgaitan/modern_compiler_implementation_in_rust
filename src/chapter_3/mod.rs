@@ -112,8 +112,26 @@ mod tests {
 
     #[test]
     fn parse_if_block() {
-        let src = "if (x) { function_call(x); function_call(x); } elseif (y) { functional_call(y); } else { function_call(z); }";
-        let should_be = ast::Statement::IfBlock;
+        let src = "if (x) { function_call(x); function_call(x); } else { function_call(z); }";
+        let should_be = ast::Statement::IfElseBlock(
+            ast::Expr::Atom(ast::Atom::Id("x".to_string())),
+            vec![
+                ast::Statement::Expr(ast::Expr::FunctionCall(ast::FunctionCall {
+                    name: "function_call".to_string(),
+                    arguments: vec![ast::Expr::Atom(ast::Atom::Id("x".to_string()))],
+                })),
+                ast::Statement::Expr(ast::Expr::FunctionCall(ast::FunctionCall {
+                    name: "function_call".to_string(),
+                    arguments: vec![ast::Expr::Atom(ast::Atom::Id("x".to_string()))],
+                })),
+            ],
+            vec![ast::Statement::Expr(ast::Expr::FunctionCall(
+                ast::FunctionCall {
+                    name: "function_call".to_string(),
+                    arguments: vec![ast::Expr::Atom(ast::Atom::Id("z".to_string()))],
+                },
+            ))],
+        );
 
         let got = parser::IfBlockParser::new().parse(src).unwrap();
         assert_eq!(got, should_be);
@@ -122,7 +140,21 @@ mod tests {
     #[test]
     fn parse_for_loop() {
         let src = "for x; y; z { function_call(x, y, z); }";
-        let should_be = ast::Statement::ForLoop;
+        let should_be = ast::Statement::ForLoop(
+            ast::Expr::Atom(ast::Atom::Id("x".to_string())),
+            ast::Expr::Atom(ast::Atom::Id("y".to_string())),
+            ast::Expr::Atom(ast::Atom::Id("z".to_string())),
+            vec![ast::Statement::Expr(ast::Expr::FunctionCall(
+                ast::FunctionCall {
+                    name: "function_call".to_string(),
+                    arguments: vec![
+                        ast::Expr::Atom(ast::Atom::Id("x".to_string())),
+                        ast::Expr::Atom(ast::Atom::Id("y".to_string())),
+                        ast::Expr::Atom(ast::Atom::Id("z".to_string())),
+                    ],
+                },
+            ))],
+        );
 
         let got = parser::ForLoopParser::new().parse(src).unwrap();
         assert_eq!(got, should_be);
@@ -131,7 +163,19 @@ mod tests {
     #[test]
     fn parse_while_loop() {
         let src = "while (x + 5) { function_call(x); }";
-        let should_be = ast::Statement::WhileLoop;
+        let should_be = ast::Statement::WhileLoop(
+            ast::Expr::BinOpExpr(Box::new(ast::BinOpExpr {
+                left: ast::Expr::Atom(ast::Atom::Id(String::from("x"))),
+                op: ast::BinOp::Add,
+                right: ast::Expr::Atom(ast::Atom::Int(5)),
+            })),
+            vec![ast::Statement::Expr(ast::Expr::FunctionCall(
+                ast::FunctionCall {
+                    name: "function_call".to_string(),
+                    arguments: vec![ast::Expr::Atom(ast::Atom::Id("x".to_string()))],
+                },
+            ))],
+        );
 
         let got = parser::WhileLoopParser::new().parse(src).unwrap();
         assert_eq!(got, should_be);
